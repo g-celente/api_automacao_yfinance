@@ -1,4 +1,6 @@
 from mvc_flask import Router
 
 
-Router.get('/', 'Dashboard#index')
+# Define routes for the application
+Router.post('/api/login', 'User#login')
+Router.post('/api/register', 'User#register')
