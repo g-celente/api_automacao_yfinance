@@ -1,6 +1,10 @@
 from flask import Flask
 from mvc_flask import FlaskMVC
 from config import config
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+db = SQLAlchemy()
 
 def create_app(config_name='development'):
     app = Flask(__name__)
@@ -8,6 +12,12 @@ def create_app(config_name='development'):
     # Load configuration
     app.config.from_object(config[config_name])
 
-    mvc = FlaskMVC(app)
+    mvc = FlaskMVC(app) 
+    db.init_app(app)
+    migrate = Migrate(app, db)
+
+    from app.model.User import User
+    from app.model.Asset import Asset
+    from app.model.Portfolio import Portfolio, PortfolioAsset  # Import models to register them with SQLAlchemy
 
     return app
