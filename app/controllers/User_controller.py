@@ -1,7 +1,8 @@
 from flask import request, jsonify, current_app
 from app.services.User_service import UserService
-from app.utils.middleware import request_logger, rate_limit
+from app.utils.middleware import request_logger, rate_limit, require_auth
 from marshmallow import Schema, fields, validate
+import time
 
 class UserSchema(Schema):
     """Schema para validação de dados do usuário."""
@@ -79,6 +80,40 @@ class UserController:
             
         except Exception as e:
             current_app.logger.error(f"Erro no login: {str(e)}")
+            return jsonify({
+                "success": False,
+                "message": "Erro interno do servidor"
+            }), 500
+
+    @request_logger()
+    @require_auth()
+    def logout(self):
+        """
+        Realiza o logout do usuário invalidando o token atual.
+        
+        Returns:
+            tuple: (response, status_code)
+        """
+        try:
+            token = request.token
+            token_payload = request.user
+            
+            # Calcula o tempo restante de validade do token
+            expires_in = token_payload.get('exp', 0) - int(time.time())
+            if expires_in <= 0:
+                return jsonify({
+                    "success": True,
+                    "message": "Token já expirado"
+                }), 200
+            
+            current_app.logger.info(f"Logout bem sucedido para usuário ID: {token_payload.get('user_id')}")
+            return jsonify({
+                "success": True,
+                "message": "Logout realizado com sucesso"
+            }), 200
+                
+        except Exception as e:
+            current_app.logger.error(f"Erro no logout: {str(e)}")
             return jsonify({
                 "success": False,
                 "message": "Erro interno do servidor"

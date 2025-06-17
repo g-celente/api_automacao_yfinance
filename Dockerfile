@@ -8,6 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV FLASK_APP app/__init__.py
 ENV FLASK_ENV production
+ENV SQLALCHEMY_DATABASE_URI postgresql://neondb_owner:npg_Qmt0nrHAXC9u@ep-winter-wind-a8bzlq2q-pooler.eastus2.azure.neon.tech/neondb?sslmode=require
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \

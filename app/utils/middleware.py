@@ -20,6 +20,7 @@ def require_auth(roles=None):
             
             try:
                 token = auth_header.split(' ')[1]
+                
                 payload, error = decode_token(token)
                 
                 if error:
@@ -28,8 +29,9 @@ def require_auth(roles=None):
                 if roles and payload.get('role') not in roles:
                     return jsonify({'message': 'Acesso não autorizado'}), 403
                 
-                # Adiciona informações do usuário ao request
+                # Adiciona informações do usuário e token ao request
                 request.user = payload
+                request.token = token
                 return f(*args, **kwargs)
                 
             except Exception as e:
@@ -56,13 +58,14 @@ def request_logger():
             })
             
             response = f(*args, **kwargs)
+            print(response)
             
             # Log da response
             duration = round((time.time() - start_time) * 1000, 2)
             current_app.logger.info({
                 'path': request.path,
                 'duration_ms': duration,
-                'status': response.status_code
+                'status': response[1] if isinstance(response, tuple) else response.status_code,
             })
             
             return response
