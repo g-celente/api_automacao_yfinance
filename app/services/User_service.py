@@ -46,3 +46,5 @@ class UserService:
                 "role": user.role
             }
         }, 200
+
+    

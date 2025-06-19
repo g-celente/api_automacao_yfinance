@@ -6,6 +6,7 @@ class AssetController:
     """Controller for asset-related operations."""
 
     @request_logger()
+    @require_auth(['admin'])
     @rate_limit(limit=10, window=60)  # Limit to 10 requests per minute
     def get_assets(self):
         """
