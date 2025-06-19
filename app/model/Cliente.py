@@ -35,7 +35,7 @@ class Cliente(db.Model):
     # Relacionamentos
     carteiras = db.relationship('Carteira', backref='cliente', lazy=True, cascade='all, delete-orphan')
 
-    def __init__(self, user_adm_id: int, name: str, email: str, cpf: str, password: str, 
+    def __init__(self, user_adm_id: int, name: str, email: str, cpf: str,
                  telefone: str = None, status: str = 'ativo'):
         """
         Inicializa um novo cliente.
@@ -94,7 +94,28 @@ class Cliente(db.Model):
         Returns:
             list: Lista de clientes
         """
-        return cls.query.filter_by(user_adm_id=user_adm_id, status='ativo').all()
+
+        clients = cls.query.filter_by(user_adm_id=user_adm_id).all()
+
+        if not clients:
+            return []
+        
+        return clients
+    
+    @classmethod
+    def save(cls, cliente: 'Cliente') -> 'Cliente':
+        """
+        Salva um cliente no banco de dados.
+
+        Args:
+            cliente (Cliente): Instância do cliente a ser salva
+
+        Returns:
+            Cliente: Cliente salvo
+        """
+        db.session.add(cliente)
+        db.session.commit()
+        return cliente
 
     def is_active(self) -> bool:
         """
