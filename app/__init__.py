@@ -19,7 +19,9 @@ def create_app(config_name='development'):
     migrate = Migrate(app, db)
 
     from app.model.User import User
+    from app.model.Cliente import Cliente
+    from app.model.Carteira import Carteira
     from app.model.Asset import Asset
-    from app.model.Portfolio import Portfolio, PortfolioAsset  # Import models to register them with SQLAlchemy
+    # Import models to register them with SQLAlchemy
 
     return app

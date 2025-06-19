@@ -5,42 +5,48 @@ from datetime import datetime
 
 class User(db.Model):
     """
-    Modelo de usuário que representa um usuário no sistema.
+    Modelo de usuário administrador que pode gerenciar clientes.
 
     Attributes:
-        id (int): ID único do usuário
-        name (str): Nome completo do usuário
-        email (str): Email único do usuário
-        password_hash (str): Hash da senha do usuário
-        role (str): Papel do usuário ('admin' ou 'client')
-        portfolios (relationship): Relacionamento com as carteiras do usuário
+        id (int): ID único do usuário administrador
+        name (str): Nome completo do administrador
+        email (str): Email único do administrador
+        password_hash (str): Hash da senha do administrador
+        role (str): Papel do usuário (sempre 'admin' para esta tabela)
+        active (bool): Status ativo/inativo do administrador
         created_at (datetime): Data de criação do usuário
+        updated_at (datetime): Data da última atualização
+        clientes (relationship): Relacionamento com os clientes gerenciados
     """
+    __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    name = db.Column(db.String(100), nullable=False, index=True)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.String(20), default='client')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    role = db.Column(db.String(20), default='admin', nullable=False)
+    active = db.Column(db.Boolean, default=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relacionamentos
-    portfolios = db.relationship('Portfolio', backref='owner', lazy=True, cascade='all, delete-orphan')
+    clientes = db.relationship('Cliente', backref='user_admin', lazy=True, cascade='all, delete-orphan')
 
-    def __init__(self, name: str, email: str, password: str, role: str = 'client'):
+    def __init__(self, name: str, email: str, password: str, role: str = 'admin', active: bool = True):
         """
-        Inicializa um novo usuário.
+        Inicializa um novo usuário administrador.
 
         Args:
             name (str): Nome do usuário
             email (str): Email do usuário
             password (str): Senha em texto plano
-            role (str, optional): Papel do usuário. Defaults to 'client'.
+            role (str, optional): Papel do usuário. Defaults to 'admin'.
         """
         self.name = name
         self.email = email
         self.password_hash = generate_password_hash(password)
         self.role = role
+        self.active = active
 
     def check_password(self, password: str) -> bool:
         """
@@ -81,7 +87,7 @@ class User(db.Model):
         Returns:
             User: Novo usuário criado
         """
-        new_user = cls(name, email, password, role)
+        new_user = cls(name, email, password, role, True)
         db.session.add(new_user)
         db.session.commit()
         return new_user
@@ -98,5 +104,6 @@ class User(db.Model):
             'name': self.name,
             'email': self.email,
             'role': self.role,
+            'active': self.active,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
