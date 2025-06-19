@@ -9,3 +9,5 @@ Router.get('/api/health', 'Health#get_health')
 Router.post('/api/login', 'User#login')
 Router.post('/api/register', 'User#register')
 Router.post('/api/logout', 'User#logout')
+
+Router.post('/api/assets/search', 'Asset#get_assets')
