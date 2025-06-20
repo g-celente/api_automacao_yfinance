@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: investment-api
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn app:app"
+    plan: free  # ou starter, standard, pro
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: investment-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: investment-redis
+          property: connectionString
+
+  - type: redis
+    name: investment-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
+databases:
+  - name: investment-db
+    plan: free
