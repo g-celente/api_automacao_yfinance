@@ -9,6 +9,7 @@ Router.get('/api/health', 'Health#get_health')
 Router.post('/api/login', 'User#login')
 Router.post('/api/register', 'User#register')
 Router.post('/api/logout', 'User#logout')
+Router.get('/api/users', 'User#get_user_by_id')
 
 #Rotas para Clientes do Usuário Administrativo
 Router.post('/api/clients', 'Cliente#create_client')

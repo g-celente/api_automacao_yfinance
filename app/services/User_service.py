@@ -46,5 +46,25 @@ class UserService:
                 "role": user.role
             }
         }, 200
+    
+    def get_user_by_id(user_id):
+        """
+        Busca um usuário pelo ID.
+        
+        Args:
+            user_id (int): ID do usuário
+        
+        Returns:
+            tuple: (response, status_code)
+        """
+        user = User.query.get(user_id)
+        
+        if not user:
+            return {"success": False, "message": "Usuário não encontrado."}, 404
+        
+        return {
+            "success": True,
+            "user": user.to_dict()
+        }, 200
 
     
