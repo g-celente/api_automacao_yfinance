@@ -64,3 +64,97 @@ class ClienteController:
                 "success": False,
                 "message": "Internal server error"
             }), 500
+
+    @request_logger()
+    @require_auth(['admin'])
+    @rate_limit(limit=10, window=60)  # Limit to 10 requests
+    def delete_client(self, cliente_id):
+        """
+        Deletes a client by ID.
+        
+        Args:
+            cliente_id (int): ID of the client to delete
+        
+        Returns:
+            tuple: (response, status_code)
+        """
+        try:
+            current_app.logger.info(f"Deleting client with ID: {cliente_id}")
+            response, status = ClienteService.deleteUser(cliente_id)
+            
+            if status != 200:
+                current_app.logger.warning(f"Failed to delete client: {response.get('message')}")
+                return jsonify(response), 400
+            
+            current_app.logger.info("Client deleted successfully.")
+            return jsonify(response), 200
+        
+        except Exception as e:
+            current_app.logger.error(f"Error deleting client: {str(e)}")
+            return jsonify({
+                "success": False,
+                "message": "Internal server error"
+            }), 500
+        
+    @request_logger()
+    @require_auth(['admin'])
+    @rate_limit(limit=10, window=60)  # Limit to 10 requests
+    def update_client(self, cliente_id):
+        """
+        Updates a client by ID.
+        
+        Args:
+            cliente_id (int): ID of the client to update
+        
+        Returns:
+            tuple: (response, status_code)
+        """
+        try:
+            data = request.get_json()
+            current_app.logger.info(f"Updating client with ID: {cliente_id} and data: {data}")
+            response, status = ClienteService.update_cliente(cliente_id, data)
+            
+            if status != 200:
+                current_app.logger.warning(f"Failed to update client: {response.get('message')}")
+                return jsonify(response), 400
+            
+            current_app.logger.info("Client updated successfully.")
+            return jsonify(response), 200
+        
+        except Exception as e:
+            current_app.logger.error(f"Error updating client: {str(e)}")
+            return jsonify({
+                "success": False,
+                "message": "Internal server error"
+            }), 500
+        
+    @request_logger()
+    @require_auth(['admin'])
+    @rate_limit(limit=10, window=60)  # Limit to 10 requests
+    def get_client_by_id(self, cliente_id):
+        """
+        Retrieves a client by ID.
+        
+        Args:
+            cliente_id (int): ID of the client to retrieve
+        
+        Returns:
+            tuple: (response, status_code)
+        """
+        try:
+            current_app.logger.info(f"Retrieving client with ID: {cliente_id}")
+            response, status = ClienteService.get_cliente_by_id(cliente_id)
+            
+            if status != 200:
+                current_app.logger.warning(f"Failed to retrieve client: {response.get('message')}")
+                return jsonify(response), 400
+            
+            current_app.logger.info("Client retrieved successfully.")
+            return jsonify(response), 200
+        
+        except Exception as e:
+            current_app.logger.error(f"Error retrieving client: {str(e)}")
+            return jsonify({
+                "success": False,
+                "message": "Internal server error"
+            }), 500

@@ -116,6 +116,17 @@ class Cliente(db.Model):
         db.session.add(cliente)
         db.session.commit()
         return cliente
+    
+    @classmethod
+    def delete(cls, cliente: 'Cliente'):
+        """
+        Deleta um cliente do banco de dados.
+
+        Args:
+            cliente (Cliente): Instância do cliente a ser deletada
+        """
+        db.session.delete(cliente)
+        db.session.commit()
 
     def is_active(self) -> bool:
         """
