@@ -156,19 +156,6 @@ class Carteira(db.Model):
         db.session.add(carteira)
         db.session.commit()
 
-    def get_valor_total(self) -> Decimal:
-        """
-        Calcula o valor total da carteira baseado nos ativos.
-
-        Returns:
-            Decimal: Valor total da carteira
-        """
-        total = Decimal('0.00')
-        for ativo in self.ativos:
-            if ativo.quantidade and ativo.valor_unitario:
-                total += Decimal(str(ativo.quantidade)) * Decimal(str(ativo.valor_unitario))
-        return total
-
     def get_quantidade_ativos(self) -> int:
         """
         Retorna a quantidade de ativos únicos na carteira.
@@ -203,12 +190,17 @@ class Carteira(db.Model):
         Returns:
             dict: Representação da carteira em dicionário
         """
+
+        client = Cliente.find_by_id(self.cliente_id)
+        if not client:
+            raise ValueError("Cliente não encontrado para a carteira.")
+
         result = {
             'id': self.id,
             'cliente_id': self.cliente_id,
+            'cliente_nome': client.name,
             'nome': self.nome,
             'descricao': self.descricao,
-            'valor_total': float(self.get_valor_total()),
             'quantidade_ativos': self.get_quantidade_ativos(),
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None

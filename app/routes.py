@@ -24,7 +24,10 @@ Router.get('/api/wallets', 'Carteira#get_portfolios')
 Router.put('/api/wallets/<int:portfolio_id>', 'Carteira#update_portfolio')
 Router.delete('/api/wallets/<int:portfolio_id>', 'Carteira#delete_portfolio')
 Router.get('/api/wallets/<int:portfolio_id>', 'Carteira#get_portfolio_by_id')
+Router.get('/api/wallets/<int:carteira_id>/indicadores', 'Asset#get_indicadores_carteira')
 
 # Rotas para Ativos
 Router.post('/api/assets/search', 'Asset#get_assets')
+Router.post('/api/assets', 'Asset#cadastrar_ativo')
+
 
