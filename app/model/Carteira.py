@@ -2,6 +2,7 @@ from app import db
 from typing import Optional, List
 from datetime import datetime
 from decimal import Decimal
+from app.model.Cliente import Cliente
 
 class Carteira(db.Model):
     """
@@ -67,6 +68,93 @@ class Carteira(db.Model):
             Optional[Carteira]: Carteira encontrada ou None
         """
         return cls.query.filter_by(nome=nome, cliente_id=cliente_id).first()
+    
+    @classmethod
+    def find_by_id(cls, carteira_id: int) -> Optional['Carteira']:
+        """
+        Busca uma carteira pelo ID.
+
+        Args:
+            carteira_id (int): ID da carteira
+
+        Returns:
+            Optional[Carteira]: Carteira encontrada ou None
+        """
+        return cls.query.filter_by(id=carteira_id).first()
+    
+    @classmethod
+    def find_all(cls) -> List['Carteira']:
+        """
+        Busca todas as carteiras no banco de dados.
+
+        Returns:
+            List[Carteira]: Lista de todas as carteiras
+        """
+        return cls.query.all()
+
+    @classmethod
+    def get_carteiras_by_admin(cls, user_adm_id: int) -> List['Carteira']:
+        """
+        Busca todas as carteiras dos clientes de um usuário administrador.
+
+        Args:
+            user_adm_id (int): ID do usuário administrador
+
+        Returns:
+            List[Carteira]: Lista de carteiras dos clientes do admin
+        """
+        return cls.query.join(Cliente).filter(Cliente.user_adm_id == user_adm_id).all()
+
+    @classmethod
+    def update_carteira_by_admin(cls, carteira_id: int, user_adm_id: int, data: dict) -> Optional['Carteira']:
+        """
+        Atualiza uma carteira apenas se ela pertencer a um cliente do admin autenticado.
+
+        Args:
+            carteira_id (int): ID da carteira
+            user_adm_id (int): ID do usuário administrador
+            data (dict): Dados para atualização
+
+        Returns:
+            Optional[Carteira]: Carteira atualizada ou None se não encontrada/autorizada
+        """
+        carteira = cls.query.join(Cliente).filter(
+            cls.id == carteira_id,
+            Cliente.user_adm_id == user_adm_id
+        ).first()
+        
+        if not carteira:
+            return None
+        
+        # Atualiza os campos permitidos
+        if 'nome' in data:
+            carteira.nome = data['nome']
+        if 'descricao' in data:
+            carteira.descricao = data['descricao']
+        
+        carteira.updated_at = datetime.utcnow()
+        
+        db.session.commit()
+        return carteira
+
+    @classmethod
+    def delete(cls, carteira: 'Carteira') -> None:
+        """
+        Deleta uma carteira do banco de dados.
+
+        Args:
+            carteira (Carteira): Carteira a ser deletada
+        """
+        db.session.delete(carteira)
+        db.session.commit()
+    
+    @classmethod
+    def save(cls, carteira: 'Carteira') -> 'Carteira':
+        """
+        Salva a carteira no banco de dados.
+        """
+        db.session.add(carteira)
+        db.session.commit()
 
     def get_valor_total(self) -> Decimal:
         """

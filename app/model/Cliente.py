@@ -82,6 +82,19 @@ class Cliente(db.Model):
             Optional[Cliente]: Cliente encontrado ou None
         """
         return cls.query.filter_by(cpf=cpf).first()
+    
+    @classmethod
+    def find_by_id(cls, cliente_id: int) -> Optional['Cliente']:
+        """
+        Busca um cliente pelo ID.
+
+        Args:
+            cliente_id (int): ID do cliente
+
+        Returns:
+            Optional[Cliente]: Cliente encontrado ou None
+        """
+        return cls.query.filter_by(id=cliente_id).first()
 
     @classmethod
     def get_clientes_by_admin(cls, user_adm_id: int) -> list:
